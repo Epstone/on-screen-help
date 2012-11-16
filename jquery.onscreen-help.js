@@ -74,22 +74,29 @@
 				this.$b3 = new Block();
 				this.$b4 = new Block();
 				
-				// currently active jquery link element -> tutorial step
+				// currently active tutorial step
 				this.currStep = undefined;
+				
+				// all defined steps as indexed array
 				this.indexArr = [];
+				
+				// jQuery elem toolbar navigation buttons
+				this.$buttons = undefined;
 				
 				// the plugin code
 				
 				//build the navigation toolbar
-				this.createToolbar();
+				this.createToolbarBasic();
+				this.createToolbarButtons();
 			};
 			
 			/* Activates the wanted step and the link which belongs to it */
 			Plugin.prototype.activateStep = function (step) {
 				var self = this;
-				
+
 				// highlight and scroll there
 				self.highlight(step.selector, step.addPadding);
+				self.showDescription(step);
 				
 				//remove the active css class from the previous link
 				if (self.currStep) {
@@ -128,16 +135,17 @@
 				}
 				
 			}
-			/* Creates the toolbar for navigating between the tutorial steps */
-			Plugin.prototype.createToolbar = function () {
+			
+			/* Creates the toolbar including the left and right navigation buttons */
+			Plugin.prototype.createToolbarBasic = function () {
 				var self = this;
 				
 				//creates the toolbar, its background and the left and right buttons
 				var $toolbarBg = $("<div class='osh-toolbar-background' />").appendTo("body");
-				var $buttons = $("<ul class='osh-button-list' />");
+				self.$buttons = $("<ul class='osh-button-list' />");
 				var $btnLeft = $("<a class='left osh-button' href='#'>&lt;</a>");
 				var $btnRight = $("<a href='#' class='right osh-button' >&gt;</a>");
-				var $toolbar = $("<div class='osh-toolbar'></div>").append([$btnLeft, $btnRight, $buttons]);
+				var $toolbar = $("<div class='osh-toolbar'></div>").append([$btnLeft, $btnRight, self.$buttons]);
 				
 				// bind step changer function to the left and right button
 				$btnLeft.click(function (e) {
@@ -151,6 +159,12 @@
 				
 				$("body").append($toolbar);
 				
+			}
+			
+			/* Creates the toolbar buttons for jumping directly to a tutorial step */
+			Plugin.prototype.createToolbarButtons = function(){
+				var self = this;
+				
 				// create a button for each step
 				var i = 0;
 				$.each(this.steps, function (index, step) {
@@ -161,7 +175,7 @@
 					//create indexed Array and store the index as reference in the tutorial step
 					step.index = i;
 					i++;
-					self.indexArr.push(step); //TODO HERE
+					self.indexArr.push(step); 
 					
 					//create link element and store it to the step
 					$link = $("<a href='#' class='osh-nav-link' />").text(step.title);
@@ -176,8 +190,33 @@
 						self.activateStep(step);
 					});
 					
-					$buttons.append($li);
+					// append tutorial navigation buttons to toolbar
+					self.$buttons.append($li);
 				});
+			
+			
+			}
+			
+			/* highlights the selector box by building black boxes around it */
+			Plugin.prototype.showDescription = function (step) {
+				
+				if (!self.$description){
+					//create description speech bubble if not yet existing
+					self.$descriptionText = $("<div class='arrow_box' />");
+					self.$description = $("<div class='arrow_box_outer'></div>").append(self.$descriptionText);
+					
+					$("body").append(self.$description);
+				}
+				
+				// change text
+				self.$descriptionText.text(step.description);
+				var descrWidthAdd = self.$description.width() / 2;
+				
+				var $target = $(step.selector);
+				var y = $target.offset().top +  $target.height() + parseInt($target.css("padding"));
+				var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"));
+				
+				self.$description.css({"top": y, "left":x});
 				
 			}
 			
