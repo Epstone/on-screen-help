@@ -144,10 +144,12 @@
 		var $toolbar = $("<div class='osh-toolbar'></div>").append([$btnLeft,$btnRight,$buttons]);
 		
 		// bind step changer function to the left and right button
-		$btnLeft.click(function(){
+		$btnLeft.click(function(e){
+				e.preventDefault();
 				self.nextPrevStep(-1);
 		});
-		$btnRight.click(function(){
+		$btnRight.click(function(e){
+				e.preventDefault();
 				self.nextPrevStep(1);
 		});
 		
