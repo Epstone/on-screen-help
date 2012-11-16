@@ -220,7 +220,7 @@
 		this.$b1.update(0, 0, "100%", y1);
 		
 		//right
-		this.$b2.update(x2, y1, docWidth - x2, height);
+		this.$b2.update(x2, y1 , docWidth - x2, height);
 		
 		//bottom
 		this.$b3.update(0, y1 + height, "100%", docHeight - y2);

@@ -38,6 +38,9 @@ a.osh-button:hover, a.osh-nav-link:hover{
 	text-decoration:none;
 	background-color:#666;
 }
+a.osh-button:link, a.osh-nav-link:link{
+	color:white;
+}
 a.osh-button:active, a.osh-nav-link:active, a.osh-nav-link.active{
 	background-color:white;
 	color:black;
@@ -62,7 +65,7 @@ ul.osh-button-list > li{
 	background:none;
 }
 
-a.osh-nav-link, a.osh-button{
+.osh-nav-link, .osh-button{
 	display:inline-block;
 	color:white;
 	cursor:pointer;
