@@ -9,6 +9,72 @@
 		// title: the objects name
 	}
 	
+	/* The higlighter controls the 4 fading divs and changes their position 
+	*  based on the selector.
+	*/
+	var Highlighter = function(){
+		var self = this;
+		
+		// keep a reference to all the fading blocks
+		self.$b1 = new Block();
+		self.$b2 = new Block();
+		self.$b3 = new Block();
+		self.$b4 = new Block();
+		
+		/* Builds 4 div fading blocks around the selected DOM element.
+		* @ sel [string] jQuery selector
+		* @ addPadding [bool] respect padding of element
+		* @ margin [number] space around the element to highlight
+		*/
+		self.highlight = function(sel, addPadding, margin){
+		
+			//get offset of selector
+				var $target = $(sel);
+				
+				if ($target.length === 0) {
+					throw "selector " + sel + " is not existing.";
+				}
+				
+				var offset = $target.offset();
+				var width = $target.width();
+				var height = $target.height();
+				var docWidth = $(document).width();
+				var docHeight = $(document).height();
+				
+				// calc coords 1
+				var y1 = offset.top;
+				var x1 = offset.left;
+				
+				//add padding if necessary
+				if (addPadding) {
+					y1 += parseInt($target.css("padding-top"));
+					x1 += parseInt($target.css("padding-left"));
+				}
+				
+				//calc coords 2
+				var x2 = x1 + width;
+				var y2 = y1 + height;
+				
+				// top
+				this.$b1.update(0, 0, "100%", y1);
+				
+				//right
+				this.$b2.update(x2, y1, docWidth - x2, height);
+				
+				//bottom
+				this.$b3.update(0, y1 + height, "100%", docHeight - y2);
+				
+				//left
+				this.$b4.update(0, y1, x1, height);
+				
+				$('body,html').animate({
+					scrollTop : (y1 - 50)
+				}, 1000);
+		
+		}
+		
+	}
+	
 	/* A block object is one of the 4 black/gray DIV overlay elements */
 	var Block = function () {
 		var self = this;
@@ -68,22 +134,17 @@
 				// You already have access to the DOM element and the options via the instance,
 				// e.g., this.element and this.options
 				
-				
-				this.$b1 = new Block();
-				this.$b2 = new Block();
-				this.$b3 = new Block();
-				this.$b4 = new Block();
-				
 				// currently active tutorial step
 				this.currStep = undefined;
 				
 				// all defined steps as indexed array
-				this.indexArr = [];
+				this.stepsIndexed = [];
 				
 				// jQuery elem toolbar navigation buttons
 				this.$buttons = undefined;
 				
-				// the plugin code
+				// The highlighter object instance
+				this.highlighter = new Highlighter();
 				
 				//build the navigation toolbar
 				this.createToolbarBasic();
@@ -95,7 +156,7 @@
 				var self = this;
 
 				// highlight and scroll there
-				self.highlight(step.selector, step.addPadding);
+				self.highlighter.highlight(step.selector, step.addPadding);
 				self.showDescription(step);
 				
 				//remove the active css class from the previous link
@@ -108,29 +169,29 @@
 			}
 			
 			/* Shows the next or previous tutorial step
-			@ nextOrPrev: 1 for next, -1 for prev step
+			@ nextOrPrev [number] 1 for next, -1 for prev step
 			 */
 			Plugin.prototype.nextPrevStep = function (nextOrPrev) {
 				var self = this;
 				
 				//no step active yet so show the first one
 				if (!self.currStep) {
-					self.activateStep(self.indexArr[0]);
+					self.activateStep(self.stepsIndexed[0]);
 				} else {
 					
 					var nextIndex = self.currStep.index + nextOrPrev;
 					
 					//check upper array bound
-					if (nextIndex >= self.indexArr.length) {
+					if (nextIndex >= self.stepsIndexed.length) {
 						nextIndex = 0;
 					}
 					//check lower array bound
 					else if (nextIndex < 0) {
-						nextIndex = self.indexArr.length - 1;
+						nextIndex = self.stepsIndexed.length - 1;
 					}
 					
 					// activate step
-					self.activateStep(self.indexArr[nextIndex]);
+					self.activateStep(self.stepsIndexed[nextIndex]);
 					
 				}
 				
@@ -175,7 +236,7 @@
 					//create indexed Array and store the index as reference in the tutorial step
 					step.index = i;
 					i++;
-					self.indexArr.push(step); 
+					self.stepsIndexed.push(step); 
 					
 					//create link element and store it to the step
 					$link = $("<a href='#' class='osh-nav-link' />").text(step.title);
@@ -212,61 +273,17 @@
 				self.$descriptionText.text(step.description);
 				var descrWidthAdd = self.$description.width() / 2;
 				
+				
 				var $target = $(step.selector);
-				var y = $target.offset().top +  $target.height() + parseInt($target.css("padding"));
-				var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"));
+				var y = $target.offset().top +  $target.height() + parseInt($target.css("padding-top"),10);
+				var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"),10);
+				
 				
 				self.$description.css({"top": y, "left":x});
 				
 			}
 			
-			/* highlights the selector box by building black boxes around it */
-			Plugin.prototype.highlight = function (sel, addPadding, margin) {
-				
-				//get offset of selector
-				var $target = $(sel);
-				
-				if ($target.length === 0) {
-					throw "selector " + sel + " is not existing.";
-				}
-				
-				var offset = $target.offset();
-				var width = $target.width();
-				var height = $target.height();
-				var docWidth = $(document).width();
-				var docHeight = $(document).height();
-				
-				// calc coords 1
-				var y1 = offset.top;
-				var x1 = offset.left;
-				
-				//add padding if necessary
-				if (addPadding) {
-					y1 += parseInt($target.css("padding-top"));
-					x1 += parseInt($target.css("padding-left"));
-				}
-				
-				//calc coords 2
-				var x2 = x1 + width;
-				var y2 = y1 + height;
-				
-				// top
-				this.$b1.update(0, 0, "100%", y1);
-				
-				//right
-				this.$b2.update(x2, y1, docWidth - x2, height);
-				
-				//bottom
-				this.$b3.update(0, y1 + height, "100%", docHeight - y2);
-				
-				//left
-				this.$b4.update(0, y1, x1, height);
-				
-				$('body,html').animate({
-					scrollTop : (y1 - 50)
-				}, 1000);
-				
-			};
+			
 			
 			// A really lightweight plugin wrapper around the constructor,
 			// preventing against multiple instantiations
