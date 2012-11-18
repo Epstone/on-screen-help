@@ -61,7 +61,7 @@
 			}
 			
 			//calc coords 2
-			var x2 = x1 + width;
+			var x2 = x1 + width +4; // + 2 because of border
 			var y2 = y1 + height;
 			
 			// calc size info objects
@@ -118,8 +118,8 @@
 			
 			if (!self.$description) {
 				//create description speech bubble if not yet existing
-				self.$descriptionText = $("<div class='arrow_box' />");
-				self.$description = $("<div class='arrow_box_outer'></div>").append(self.$descriptionText);
+				self.$descriptionText = $("<div class='osh_arrow_box' />");
+				self.$description = $("<div class='osh_arrow_box_outer'></div>").append(self.$descriptionText);
 				
 				$("body").append(self.$description);
 			}
@@ -148,7 +148,7 @@
 				var $elem = $(step.selector);
 				var offset = $(step.selector).offset();
 				
-				var $zone = $("<div class='osh-marked-zone' />")
+				var $zone = $("<div class='osh_marked_zone' />")
 					.appendTo("body")
 					.css({
 						"top" : offset.top + paddingTop($elem),
@@ -160,7 +160,10 @@
 				// add child class if this step has a parent step
 				
 				if(step.parent){
-					$zone.addClass("is-child");
+					
+					$zone.addClass("osh_is_child");
+					$zone.css({"left":$zone.offset().left});
+					$zone.width($zone.width());
 				}
 				
 				$("<div/>").append($("<p />").text(step.title)).appendTo($zone);
@@ -184,7 +187,7 @@
 		var self = this;
 		
 		// create jquery element and add it to DOM
-		var $elem = $("<div class='osh-block'/>");
+		var $elem = $("<div class='osh_block'/>");
 		$("body").append($elem);
 		
 		// object properties
@@ -216,11 +219,11 @@
 		self.createToolbarBasic = function (prevNextStepCallback) {
 			
 			//creates the toolbar, its background and the left and right buttons
-			$("<div class='osh-toolbar-background' />").appendTo("body"); // toolbar background
-			self.$buttons = $("<ul class='osh-button-list' />");
-			var $btnLeft = $("<a class='left osh-button' href='#'>&lt;</a>");
-			var $btnRight = $("<a href='#' class='right osh-button' >&gt;</a>");
-			var $toolbar = $("<div class='osh-toolbar'></div>").append([$btnLeft, $btnRight, self.$buttons]);
+			$("<div class='osh_toolbar_background' />").appendTo("body"); // toolbar background
+			self.$buttons = $("<ul class='osh_button_list' />");
+			var $btnLeft = $("<a class='left osh_button' href='#'>&lt;</a>");
+			var $btnRight = $("<a href='#' class='right osh_button' >&gt;</a>");
+			var $toolbar = $("<div class='osh_toolbar'></div>").append([$btnLeft, $btnRight, self.$buttons]);
 			
 			// bind step changer function to the left and right button
 			$btnLeft.click(function (e) {
@@ -242,7 +245,7 @@
 			$.each(steps, function (index, step) {
 				
 				//create link element and store it to the step
-				var $link = $("<a href='#' class='osh-nav-link' />").text(step.title);
+				var $link = $("<a href='#' class='osh_nav_link' />").text(step.title);
 				var $li = $("<li />").append($link);
 				step.$link = $link;
 				
@@ -332,31 +335,32 @@
 			self.highlightCallback.call(self, newStep.selector, newStep.addPadding);
 			self.showDescriptionCallback.call(self, newStep);
 			
-			newStep.$zone.hide();
+			
+			
+			
 			
 			//remove the active css class from the previous link
 			if (_currStep) {
 				_currStep.$link.removeClass("active");
+				_currStep.$zone.show();
 				
-				if(_currStep === newStep.parent){
-					console.log("previous step equals new steps parent");
-					_currStep.$zone.hide();
-				}else if (_currStep !== newStep.parent){
-					console.log("previous step different to new steps parent");
-					console.debug(_currStep.$zone);
-					_currStep.$zone.show();
-				
-					if(_currStep.parent){
-						_currStep.parent.$zone.show();
-					}
+				if(_currStep.parent){
+					_currStep.parent.$zone.show();
 				}
-			}else if (newStep.parent){
+			}
+			
+			
+			if (newStep.parent){
 				newStep.parent.$zone.hide();
 			}
 			
+			
+			
 			//add active css class to new $link
+			newStep.$zone.hide();
+			newStep.$link.addClass("active");
 			_currStep = newStep;
-			_currStep.$link.addClass("active");
+			
 			
 		};
 		
