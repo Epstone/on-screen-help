@@ -1,0 +1,158 @@
+.osh_block{
+	margin: auto;
+	z-index: 100;
+	position: absolute;
+	background-color: black;
+	opacity: .4;
+	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; 
+	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Safari and Chrome */
+	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Firefox 4 */
+	-o-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Opera */
+}
+
+.osh_toolbar_background{
+	opacity: .5;
+	background-color:black;
+}
+.osh_toolbar, .osh_toolbar_background{
+	position: fixed;
+	width: 100%;
+	z-index: 150;
+	height: 40px;
+	bottom:0;	
+	padding: 5px;
+	text-align:center;
+}
+.osh_toolbar{
+	background-color:transparent;
+}
+.osh_button:visited{
+	color:white;
+}
+.osh_button{
+	display:inline-block;
+	border-radius:50%;
+	position:absolute;
+}
+a.osh_button:hover, a.osh_nav_link:hover{
+	text-decoration:none;
+	background-color:#666;
+}
+a.osh_button:link, a.osh_nav_link:link{
+	color:white;
+}
+a.osh_button:active, a.osh_nav_link:active, a.osh_nav_link.active{
+	background-color:white;
+	color:black;
+}
+
+.osh_button.left{
+	left:15px;
+}
+.osh_button.right{
+	right:15px;
+}
+ul.osh_button_list{
+	display:inline-block;
+	list-style-type: none;
+	list-style-image: none;
+	margin:0;
+}
+ul.osh_button_list > li{
+	display:inline-block;
+	list-style-type:none;
+	list-style-image:none;
+	background:none;
+}
+
+.osh_nav_link, .osh_button{
+	display:inline-block;
+	color:white;
+	cursor:pointer;
+	border: 2px solid white;
+	padding: 10px 12px;
+	text-decoration:none;
+	font-size: 2em;
+}
+
+.osh_arrow_box_outer{
+	position: absolute;
+	z-index:150;
+	
+	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; 
+	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Safari and Chrome */
+	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Firefox 4 */
+	-o-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear; /* Opera */
+}
+.osh_arrow_box {
+	position: relative;
+	background: #000000;
+	border: 4px solid #c2e1f5;	
+	padding: 40px;
+	width: 280px;
+	height: 100px;
+	color: white;
+	font-size:1.8em;
+	line-height:1.2em;
+	top:36px;
+	
+	
+	
+}
+.osh_arrow_box:after, .osh_arrow_box:before {
+	bottom: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.osh_arrow_box:after {
+	border-color: rgba(0, 0, 0, 0);
+	border-bottom-color: #000000;
+	border-width: 30px;
+	left: 50%;
+	margin-left: -30px;
+}
+.osh_arrow_box:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-bottom-color: #c2e1f5;
+	border-width: 36px;
+	left: 50%;
+	margin-left: -36px;
+}
+
+.osh_marked_zone.osh_is_child{
+	background-color:transparent;
+	border:2px dashed green;
+	color: black;
+}
+.osh_marked_zone{
+	border:2px solid white;
+	background-color: lime;
+	font-size:2em;
+	position:absolute;
+	text-align:center;
+	opacity:.9;
+	z-index: 150;
+	color:#000;
+	cursor:pointer;
+}
+.osh_marked_zone:hover{
+	background-color:yellow;
+}
+
+.osh_marked_zone > div{
+	display: table;
+	width:100%;	
+	height:100%;
+}
+
+.osh_marked_zone > div > p{
+	display: table-cell; 
+	vertical-align: middle; 
+	text-align: center; 
+	
+}
