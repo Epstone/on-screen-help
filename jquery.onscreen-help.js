@@ -1,6 +1,16 @@
 ;
 (function ($, window, undefined) {
 	"use strict";
+	
+	/* utility functions */
+	function paddingLeft($elem) {
+		return parseInt($elem.css("padding-left"), 10);
+	}
+	
+	function paddingTop($elem) {
+		return parseInt($elem.css("padding-top"), 10);
+	}
+	
 	/* A step is an internally used tutorial step */
 	var Step = function () {
 		
@@ -8,6 +18,7 @@
 		// margin:   Space around element
 		// addPadding: true or false
 		// title: the objects name
+		// $zone -> clickable zone
 	};
 	
 	/* SizeInfo object for easier size and position user interface updates
@@ -45,24 +56,18 @@
 			
 			//add padding if necessary
 			if (addPadding) {
-				y1 += parseInt($target.css("padding-top"), 10);
-				x1 += parseInt($target.css("padding-left"), 10);
+				y1 += paddingTop($target);
+				x1 += paddingLeft($target);
 			}
 			
 			//calc coords 2
 			var x2 = x1 + width;
 			var y2 = y1 + height;
 			
-			// b1 top
+			// calc size info objects
 			self.b1 = new SizeInfo(0, 0, "100%", y1);
-			
-			// b2 right
 			self.b2 = new SizeInfo(x2, y1, docWidth - x2, height);
-			
-			// b3 bottom
 			self.b3 = new SizeInfo(0, y1 + height, "100%", docHeight - y2);
-			
-			// b4 left
 			self.b4 = new SizeInfo(0, y1, x1, height);
 			
 			return this;
@@ -130,6 +135,44 @@
 			self.$description.css({
 				"top" : y,
 				"left" : x
+			});
+			
+		};
+		
+		/* Creates clickable buttons over the targeted step elements */
+		self.buildClickableZones = function (steps, stepActivationCallback) {
+			
+			$.each(steps, function (index, step) {
+				console.debug("zone creating");
+				
+				var $elem = $(step.selector);
+				var offset = $(step.selector).offset();
+				
+				var $zone = $("<div class='osh-marked-zone' />")
+					.appendTo("body")
+					.css({
+						"top" : offset.top + paddingTop($elem),
+						"left" : offset.left + paddingLeft($elem),
+						"width" : $elem.width(),
+						"height" : $elem.height()
+					});
+					
+				// add child class if this step has a parent step
+				
+				if(step.parent){
+					$zone.addClass("is-child");
+				}
+				
+				$("<div/>").append($("<p />").text(step.title)).appendTo($zone);
+				
+				//store a reference in the step for the zone
+				step.$zone = $zone;
+				
+				//bind step activation callback to $zone click event
+				step.$zone.click(function(e){
+					stepActivationCallback.call(self, step);
+				});
+				
 			});
 			
 		};
@@ -222,6 +265,21 @@
 	var TutorialController = function () {
 		var self = this;
 		
+		/* Searches up the DOM for a tutorial step which would be a parent to the 
+		*  given jQuery element and returns the step
+		*/
+		function tryGetParent(steps, $elem) {
+		
+			var resultStep;
+			$.each(steps, function (j, parStep) {
+				if ($elem.parents(parStep.selector).length > 0) {
+					resultStep = parStep;
+				}
+			});
+			
+			return resultStep;
+		}
+		
 		// currently active tutorial step
 		var _currStep;
 		
@@ -241,12 +299,20 @@
 				// store index as title property
 				step.title = index;
 				
-				//create indexed array and store the index as reference in the tutorial step
+				//store the index as reference in the tutorial step
 				step.index = i;
+				step.$elem = $(step.selector);
 				i++;
+				
+				//check if the element is contained in a parent step's element
+				step.parent = tryGetParent(rawSteps, step.$elem);
+				
+				// add to indexed array
 				_stepsIndexed.push(step);
+				
 			});
 			
+			return self.getSteps();
 		};
 		
 		/* Returns the indexed tutorial steps array */
@@ -255,24 +321,43 @@
 		};
 		
 		/* Activates the wanted step and the link which belongs to it */
-		self.activateStep = function (step) {
+		self.activateStep = function (newStep) {
 			
 			//do nothing if setp equals the previous one
-			if (step === _currStep) {
+			if (newStep === _currStep) {
 				return;
 			}
 			
 			// highlight and scroll there
-			self.highlightCallback.call(self, step.selector, step.addPadding);
-			self.showDescriptionCallback.call(self, step);
+			self.highlightCallback.call(self, newStep.selector, newStep.addPadding);
+			self.showDescriptionCallback.call(self, newStep);
+			
+			newStep.$zone.hide();
 			
 			//remove the active css class from the previous link
 			if (_currStep) {
 				_currStep.$link.removeClass("active");
+				
+				if(_currStep === newStep.parent){
+					console.log("previous step equals new steps parent");
+					_currStep.$zone.hide();
+				}else if (_currStep !== newStep.parent){
+					console.log("previous step different to new steps parent");
+					console.debug(_currStep.$zone);
+					_currStep.$zone.show();
+				
+					if(_currStep.parent){
+						_currStep.parent.$zone.show();
+					}
+				}
+			}else if (newStep.parent){
+				newStep.parent.$zone.hide();
 			}
+			
 			//add active css class to new $link
-			_currStep = step;
+			_currStep = newStep;
 			_currStep.$link.addClass("active");
+			
 		};
 		
 		/* Shows the next or previous tutorial step
@@ -340,14 +425,16 @@
 		//the tutorial controller -> init callbacks for UI manipulation
 		this.tutorialController = new TutorialController();
 		
-		this.tutorialController.initialize(this.steps);
+		var indexedSteps = this.tutorialController.initialize(this.steps);
 		this.tutorialController.highlightCallback = this.highlighter.highlight;
 		this.tutorialController.showDescriptionCallback = this.highlighter.showDescription;
+		
+		//create the marked clicable zones over the black fading boxes
+		this.highlighter.buildClickableZones(indexedSteps, this.tutorialController.activateStep);
 		
 		// The Toolbar creator -> build it
 		this.toolbarCreator = new ToolbarCreator();
 		this.toolbarCreator.createToolbarBasic(this.tutorialController.nextPrevStep);
-		var indexedSteps = this.tutorialController.getSteps();
 		this.toolbarCreator.createToolbarButtons(indexedSteps, this.tutorialController.activateStep);
 		
 	};
