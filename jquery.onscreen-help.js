@@ -1,16 +1,77 @@
 ;
 (function ($, window, undefined) {
-	
+	"use strict";
 	/* A step is an internally used tutorial step */
 	var Step = function () {
+		
 		// selector: Element to highlight
 		// margin:   Space around element
 		// addPadding: true or false
 		// title: the objects name
-	}
+	};
+	
+	/* SizeInfo object for easier size and position user interface updates
+	 * x [number] left offset
+	 * y [number] top offset
+	 * width [string or number] css property for the width
+	 * height [string or number] css property for the height
+	 */
+	var SizeInfo = function (x, y, width, height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	};
+	
+	/* Calculates the sizes and position for the UI elements */
+	var Calculator = function () {
+		var self = this;
+		
+		// our fading block size info objects
+		self.b1 = self.b2 = self.b3 = self.b4 = undefined;
+		
+		/* Initializes the calculator and sets the sizeInfo results for the 4 fading blocks */
+		self.initialize = function ($target, addPadding) {
+			
+			var offset = $target.offset();
+			var width = $target.width();
+			var height = $target.height();
+			var docWidth = $(document).width();
+			var docHeight = $(document).height();
+			
+			// calc coords 1
+			var y1 = offset.top;
+			var x1 = offset.left;
+			
+			//add padding if necessary
+			if (addPadding) {
+				y1 += parseInt($target.css("padding-top"), 10);
+				x1 += parseInt($target.css("padding-left"), 10);
+			}
+			
+			//calc coords 2
+			var x2 = x1 + width;
+			var y2 = y1 + height;
+			
+			// b1 top
+			self.b1 = new SizeInfo(0, 0, "100%", y1);
+			
+			// b2 right
+			self.b2 = new SizeInfo(x2, y1, docWidth - x2, height);
+			
+			// b3 bottom
+			self.b3 = new SizeInfo(0, y1 + height, "100%", docHeight - y2);
+			
+			// b4 left
+			self.b4 = new SizeInfo(0, y1, x1, height);
+			
+			return this;
+		};
+		
+	};
 	
 	/* The Higlighter instance controls the 4 fading divs and changes their position and size */
-	var Highlighter = function(){
+	var Highlighter = function () {
 		var self = this;
 		
 		// keep a reference to all the fading blocks
@@ -20,61 +81,37 @@
 		self.$b4 = new Block();
 		
 		/* Builds 4 div fading blocks around the selected DOM element.
-		* @ sel [string] jQuery selector
-		* @ addPadding [bool] respect padding of element
-		* @ margin [number] space around the element to highlight
-		*/
-		self.highlight = function(sel, addPadding, margin){
-		
-			//get offset of selector
-				var $target = $(sel);
-				
-				if ($target.length === 0) {
-					throw "selector " + sel + " is not existing.";
-				}
-				
-				var offset = $target.offset();
-				var width = $target.width();
-				var height = $target.height();
-				var docWidth = $(document).width();
-				var docHeight = $(document).height();
-				
-				// calc coords 1
-				var y1 = offset.top;
-				var x1 = offset.left;
-				
-				//add padding if necessary
-				if (addPadding) {
-					y1 += parseInt($target.css("padding-top"));
-					x1 += parseInt($target.css("padding-left"));
-				}
-				
-				//calc coords 2
-				var x2 = x1 + width;
-				var y2 = y1 + height;
-				
-				// top
-				self.$b1.update(0, 0, "100%", y1);
-				
-				//right
-				self.$b2.update(x2, y1, docWidth - x2, height);
-				
-				//bottom
-				self.$b3.update(0, y1 + height, "100%", docHeight - y2);
-				
-				//left
-				self.$b4.update(0, y1, x1, height);
-				
-				$('body,html').animate({
-					scrollTop : (y1 - 50)
-				}, 1000);
-		
-		}
+		 * @ sel [string] jQuery selector
+		 * @ addPadding [bool] respect padding of element
+		 * @ margin [number] space around the element to highlight
+		 */
+		self.highlight = function (sel, addPadding, margin) {
+			
+			//check that element is existing
+			var $target = $(sel);
+			if ($target.length === 0) {
+				throw "selector " + sel + " is not existing.";
+			}
+			
+			// calculate block size and positions
+			var calc = new Calculator().initialize($target, addPadding);
+			
+			// update all block sizes and positions
+			self.$b1.update(calc.b1);
+			self.$b2.update(calc.b2);
+			self.$b3.update(calc.b3);
+			self.$b4.update(calc.b4);
+			
+			$('body,html').animate({
+				scrollTop : (calc.b1.height - 50)
+			}, 1000);
+			
+		};
 		
 		/* Shows a arrowed description bubble box */
 		self.showDescription = function (step) {
 			
-			if (!self.$description){
+			if (!self.$description) {
 				//create description speech bubble if not yet existing
 				self.$descriptionText = $("<div class='arrow_box' />");
 				self.$description = $("<div class='arrow_box_outer'></div>").append(self.$descriptionText);
@@ -86,17 +123,18 @@
 			self.$descriptionText.text(step.description);
 			var descrWidthAdd = self.$description.width() / 2;
 			
-			
 			var $target = $(step.selector);
-			var y = $target.offset().top +  $target.height() + parseInt($target.css("padding-top"),10);
-			var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"),10);
+			var y = $target.offset().top + $target.height() + parseInt($target.css("padding-top"), 10);
+			var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"), 10);
 			
+			self.$description.css({
+				"top" : y,
+				"left" : x
+			});
 			
-			self.$description.css({"top": y, "left":x});
-			
-		}
+		};
 		
-	}
+	};
 	
 	/* A block object is one of the 4 black/gray DIV overlay elements */
 	var Block = function () {
@@ -107,31 +145,25 @@
 		$("body").append($elem);
 		
 		// object properties
-		self.x = undefined;
-		self.y = undefined;
-		self.width = undefined;
-		self.height = undefined;
+		self.sizeInfo = undefined;
 		
 		/* update the blocks position and size */
-		self.update = function (x, y, width, height) {
+		self.update = function (sizeInfo) {
 			
 			$elem.css({
-				"left" : x,
-				"top" : y,
-				"width" : width,
-				"height" : height
+				"left" : sizeInfo.x,
+				"top" : sizeInfo.y,
+				"width" : sizeInfo.width,
+				"height" : sizeInfo.height
 			});
 			
 			// keep track of current position and size
-			self.x = x;
-			self.y = y;
-			self.width = width;
-			self.height = height;
-		}
-	}
-			
+			self.sizeInfo = sizeInfo;
+		};
+	};
+	
 	/* Builds the toolbar for navigating between the different tutorial steps */
-	var ToolbarCreator = function(){
+	var ToolbarCreator = function () {
 		var self = this;
 		
 		//store a reference to the tutorial step buttons
@@ -141,7 +173,7 @@
 		self.createToolbarBasic = function (prevNextStepCallback) {
 			
 			//creates the toolbar, its background and the left and right buttons
-			var $toolbarBg = $("<div class='osh-toolbar-background' />").appendTo("body");
+			$("<div class='osh-toolbar-background' />").appendTo("body"); // toolbar background
 			self.$buttons = $("<ul class='osh-button-list' />");
 			var $btnLeft = $("<a class='left osh-button' href='#'>&lt;</a>");
 			var $btnRight = $("<a href='#' class='right osh-button' >&gt;</a>");
@@ -150,26 +182,25 @@
 			// bind step changer function to the left and right button
 			$btnLeft.click(function (e) {
 				e.preventDefault();
-				prevNextStepCallback(-1);
+				prevNextStepCallback.call(self, -1);
 			});
 			$btnRight.click(function (e) {
 				e.preventDefault();
-				prevNextStepCallback(1);
+				prevNextStepCallback.call(self, 1);
 			});
 			
 			$("body").append($toolbar);
-		}
+		};
 		
 		/* Creates the toolbar buttons for jumping directly to a tutorial step */
-		self.createToolbarButtons = function(steps, stepActivationCallback){
+		self.createToolbarButtons = function (steps, stepActivationCallback) {
 			
 			// create a button for each step
-			var i = 0;
 			$.each(steps, function (index, step) {
 				
 				//create link element and store it to the step
-				$link = $("<a href='#' class='osh-nav-link' />").text(step.title);
-				$li = $("<li />").append($link);
+				var $link = $("<a href='#' class='osh-nav-link' />").text(step.title);
+				var $li = $("<li />").append($link);
 				step.$link = $link;
 				
 				//switch to the wanted step when user clicks a navigation button
@@ -177,34 +208,33 @@
 					e.preventDefault();
 					
 					// activates the clicked link and the tutorial step
-					stepActivationCallback(step);
+					stepActivationCallback.call(self, step);
 				});
 				
 				// append tutorial navigation buttons to toolbar
 				self.$buttons.append($li);
 			});
-		
-		
-		}
-	}	
+			
+		};
+	};
 	
 	/* Handles the tutorial steps and reacts on user events */
-	var TutorialController = function(){
+	var TutorialController = function () {
 		var self = this;
-	
+		
 		// currently active tutorial step
-		this.currStep = undefined;	
+		var _currStep;
 		
 		// all tutorial steps as indexed array
 		var _stepsIndexed = [];
-	
+		
 		// UI manipulation methods
 		this.highlightCallback = undefined;
 		this.showDescriptionCallback = undefined;
-	
-		/* Takes all raw tutorial steps and initializes the indexed array */
-		self.initialize = function(rawSteps){
 		
+		/* Takes all raw tutorial steps and initializes the indexed array */
+		self.initialize = function (rawSteps) {
+			
 			var i = 0;
 			$.each(rawSteps, function (index, step) {
 				
@@ -214,44 +244,48 @@
 				//create indexed array and store the index as reference in the tutorial step
 				step.index = i;
 				i++;
-				_stepsIndexed.push(step); 
+				_stepsIndexed.push(step);
 			});
-		
-		}
+			
+		};
 		
 		/* Returns the indexed tutorial steps array */
-		self.getSteps = function(){
+		self.getSteps = function () {
 			return _stepsIndexed;
-		}
-	
+		};
+		
 		/* Activates the wanted step and the link which belongs to it */
 		self.activateStep = function (step) {
-
+			
+			//do nothing if setp equals the previous one
+			if (step === _currStep) {
+				return;
+			}
+			
 			// highlight and scroll there
-			self.highlightCallback(step.selector, step.addPadding);
-			self.showDescriptionCallback(step);
+			self.highlightCallback.call(self, step.selector, step.addPadding);
+			self.showDescriptionCallback.call(self, step);
 			
 			//remove the active css class from the previous link
-			if (self.currStep) {
-				self.currStep.$link.removeClass("active");
+			if (_currStep) {
+				_currStep.$link.removeClass("active");
 			}
 			//add active css class to new $link
-			self.currStep = step;
-			self.currStep.$link.addClass("active");
-		}
-	
-	
+			_currStep = step;
+			_currStep.$link.addClass("active");
+		};
+		
 		/* Shows the next or previous tutorial step
-		*  @ nextOrPrev [number] 1 for next, -1 for prev step
-		*/
+		 *  @ nextOrPrev [number] 1 for next, -1 for prev step
+		 */
 		self.nextPrevStep = function (nextOrPrev) {
 			
 			//no step active yet so show the first one
-			if (!self.currStep) {
+			if (!_currStep) {
 				self.activateStep(_stepsIndexed[0]);
 			} else {
 				
-				var nextIndex = self.currStep.index + nextOrPrev;
+				var nextIndex = _currStep.index + nextOrPrev;
 				
 				//check upper array bound
 				if (nextIndex >= _stepsIndexed.length) {
@@ -263,10 +297,10 @@
 				}
 				
 				// activate step
-				self.activateStep(_stepsIndexed[nextIndex]);		
+				self.activateStep(_stepsIndexed[nextIndex]);
 			}
-		}
-	}
+		};
+	};
 	
 	/* --------------- jQuery Plugin Code --------------- */
 	// Create the defaults once
@@ -279,7 +313,6 @@
 	// The actual plugin constructor
 	function Plugin(element, steps, options) {
 		
-		var self = this;
 		this.element = element;
 		
 		this.options = $.extend({}, defaults, options);
@@ -304,7 +337,7 @@
 		// The highlighter object instance
 		this.highlighter = new Highlighter();
 		
-		//the tutorial controller -> get callbacks for UI manipulation
+		//the tutorial controller -> init callbacks for UI manipulation
 		this.tutorialController = new TutorialController();
 		
 		this.tutorialController.initialize(this.steps);
@@ -314,12 +347,11 @@
 		// The Toolbar creator -> build it
 		this.toolbarCreator = new ToolbarCreator();
 		this.toolbarCreator.createToolbarBasic(this.tutorialController.nextPrevStep);
-		this.toolbarCreator.createToolbarButtons(this.tutorialController.getSteps(), 
-												 this.tutorialController.activateStep);
+		var indexedSteps = this.tutorialController.getSteps();
+		this.toolbarCreator.createToolbarButtons(indexedSteps, this.tutorialController.activateStep);
 		
 	};
 	
-
 	// A really lightweight plugin wrapper around the constructor,
 	// preventing against multiple instantiations
 	$.fn[onScreenHelp] = function (steps, options) {
@@ -328,6 +360,7 @@
 				$.data(this, 'plugin_' + onScreenHelp, new Plugin(this, steps, options));
 			}
 		});
-	}
+	};
 	
-}(jQuery, window));
+}
+	(jQuery, window));
