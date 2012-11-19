@@ -85,6 +85,12 @@
 		self.$b3 = new Block();
 		self.$b4 = new Block();
 		
+		//jq elem for description box container
+		self.$descriptionOuter = undefined;
+		
+		// actual speech bubble div
+		self.$descriptionBubble = undefined;
+		
 		/* Builds 4 div fading blocks around the selected DOM element.
 		 * @ sel [string] jQuery selector
 		 * @ addPadding [bool] respect padding of element
@@ -113,26 +119,40 @@
 			
 		};
 		
+		/* Creates or updates the jQuery element for the description box */
+		function _initDescriptionBox(position){
+			if (!self.$descriptionOuter) {
+				//create description speech bubble if not yet existing
+				self.$descriptionBubble = $("<div class='osh_arrow_box' />");
+				self.$descriptionOuter = $("<div class='osh_arrow_box_outer'></div>").append(self.$descriptionBubble);
+				
+				$("body").append(self.$descriptionOuter);
+			}
+			
+			if(!position){
+				position = "bottom";
+			}
+			// remove old position class and add new
+			self.$descriptionBubble.removeClass("top bottom left right");
+			self.$descriptionBubble.addClass(position);
+			
+		}
+		
 		/* Shows a arrowed description bubble box */
 		self.showDescription = function (step) {
 			
-			if (!self.$description) {
-				//create description speech bubble if not yet existing
-				self.$descriptionText = $("<div class='osh_arrow_box' />");
-				self.$description = $("<div class='osh_arrow_box_outer'></div>").append(self.$descriptionText);
-				
-				$("body").append(self.$description);
-			}
+			// create the description box or update it's arrow position
+			_initDescriptionBox(step.position);
 			
 			// change text
-			self.$descriptionText.text(step.description);
-			var descrWidthAdd = self.$description.width() / 2;
+			self.$descriptionBubble.text(step.description);
+			var descrWidthAdd = self.$descriptionOuter.width() / 2;
 			
 			var $target = $(step.selector);
 			var y = $target.offset().top + $target.height() + parseInt($target.css("padding-top"), 10);
 			var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"), 10);
 			
-			self.$description.css({
+			self.$descriptionOuter.css({
 				"top" : y,
 				"left" : x
 			});
