@@ -11,6 +11,10 @@
 		return parseInt($elem.css("padding-top"), 10);
 	}
 	
+	function capitaliseFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+	
 	/* A step is an internally used tutorial step */
 	var Step = function () {
 		
@@ -38,11 +42,8 @@
 	var Calculator = function () {
 		var self = this;
 		
-		// our fading block size info objects
-		self.b1 = self.b2 = self.b3 = self.b4 = undefined;
-		
 		/* Initializes the calculator and sets the sizeInfo results for the 4 fading blocks */
-		self.initialize = function ($target, addPadding) {
+		self.fadingBlocks = function ($target, addPadding) {
 			
 			var offset = $target.offset();
 			var width = $target.width();
@@ -61,16 +62,60 @@
 			}
 			
 			//calc coords 2
-			var x2 = x1 + width +4; // + 2 because of border
+			var x2 = x1 + width + 4; // + 2 because of border
 			var y2 = y1 + height;
 			
-			// calc size info objects
-			self.b1 = new SizeInfo(0, 0, "100%", y1);
-			self.b2 = new SizeInfo(x2, y1, docWidth - x2, height);
-			self.b3 = new SizeInfo(0, y1 + height, "100%", docHeight - y2);
-			self.b4 = new SizeInfo(0, y1, x1, height);
+			// return the calc size info objects
+			return {
+				b1 : new SizeInfo(0, 0, "100%", y1),
+				b2 : new SizeInfo(x2, y1, docWidth - x2, height),
+				b3 : new SizeInfo(0, y1 + height, "100%", docHeight - y2),
+				b4 : new SizeInfo(0, y1, x1, height)
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble bottom side */
+		self.descriptionBottom = function ($target, $descriptionOuter) {
 			
-			return this;
+			var descrWidthAdd = $descriptionOuter.width() / 2;
+			var offset = $target.offset();
+			return {
+				x : offset.left + ($target.width() / 2) - descrWidthAdd + paddingLeft($target),
+				y : offset.top + $target.height() + paddingTop($target)
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble left side */
+		self.descriptionLeft = function ($target, $descriptionOuter) {
+			
+			var descrHeightHalf = $descriptionOuter.height() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) - $descriptionOuter.width(),
+				y : (offset.top + paddingTop($target)) + ($target.height() / 2) - descrHeightHalf
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble top side */
+		self.descriptionTop = function ($target, $descriptionOuter) {
+			
+			var descrWidthHalf = $descriptionOuter.width() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) + ($target.width() / 2) - descrWidthHalf,
+				y : offset.top + paddingTop($target) - $descriptionOuter.height()
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble left side */
+		self.descriptionRight = function ($target, $descriptionOuter) {
+			
+			var descrHeightHalf = $descriptionOuter.height() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) + $target.width(),
+				y : (offset.top + paddingTop($target)) + ($target.height() / 2) - descrHeightHalf
+			};
 		};
 		
 	};
@@ -84,6 +129,12 @@
 		self.$b2 = new Block();
 		self.$b3 = new Block();
 		self.$b4 = new Block();
+		
+		//jq elem for description box container
+		self.$descriptionOuter = undefined;
+		
+		// actual speech bubble div
+		self.$descriptionBubble = undefined;
 		
 		/* Builds 4 div fading blocks around the selected DOM element.
 		 * @ sel [string] jQuery selector
@@ -99,72 +150,96 @@
 			}
 			
 			// calculate block size and positions
-			var calc = new Calculator().initialize($target, addPadding);
+			var result = new Calculator().fadingBlocks($target, addPadding);
 			
 			// update all block sizes and positions
-			self.$b1.update(calc.b1);
-			self.$b2.update(calc.b2);
-			self.$b3.update(calc.b3);
-			self.$b4.update(calc.b4);
-			
-			$('body,html').animate({
-				scrollTop : (calc.b1.height - 50)
-			}, 1000);
+			self.$b1.update(result.b1);
+			self.$b2.update(result.b2);
+			self.$b3.update(result.b3);
+			self.$b4.update(result.b4);
 			
 		};
+		
+		/* Creates or updates the jQuery element for the description box */
+		function _initDescriptionBox(position) {
+			if (!self.$descriptionOuter) {
+				//create description speech bubble if not yet existing
+				self.$descriptionBubble = $("<div class='osh_arrow_box' />");
+				self.$descriptionOuter = $("<div class='osh_arrow_box_outer'></div>").append(self.$descriptionBubble);
+				
+				$("body").append(self.$descriptionOuter);
+			}
+			
+			if (!position) {
+				position = "bottom";
+			}
+			// remove old position class and add new
+			self.$descriptionBubble.removeClass("top bottom left right");
+			self.$descriptionBubble.addClass(position);
+			
+		}
 		
 		/* Shows a arrowed description bubble box */
 		self.showDescription = function (step) {
 			
-			if (!self.$description) {
-				//create description speech bubble if not yet existing
-				self.$descriptionText = $("<div class='osh_arrow_box' />");
-				self.$description = $("<div class='osh_arrow_box_outer'></div>").append(self.$descriptionText);
-				
-				$("body").append(self.$description);
-			}
+			// create the description box or update it's arrow position
+			_initDescriptionBox(step.position);
 			
 			// change text
-			self.$descriptionText.text(step.description);
-			var descrWidthAdd = self.$description.width() / 2;
+			self.$descriptionBubble.text(step.description);
 			
-			var $target = $(step.selector);
-			var y = $target.offset().top + $target.height() + parseInt($target.css("padding-top"), 10);
-			var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"), 10);
+			// calculate the position for the description box
+			var position = "description" + capitaliseFirstLetter(step.position);
+			var result = new Calculator()[position](step.$elem, self.$descriptionOuter);
 			
-			self.$description.css({
-				"top" : y,
-				"left" : x
+			self.$descriptionOuter.css({
+				"top" : result.y,
+				"left" : result.x
 			});
 			
 		};
+		
+		/* Repositions the clickable zones when user resizes the browser window */
+		self.reposClickableZones = function (steps) {
+			
+			$.each(steps, function (index, step) {
+				_positionClickableZone(step.$zone, step);
+			});
+		};
+		
+		/* Calculates the position and sets its css properties for a clickable zone*/
+		function _positionClickableZone($zone, step) {
+			
+			var $elem = step.$elem;
+			var offset = $elem.offset();
+			$zone.css({
+				"top" : offset.top + paddingTop($elem),
+				"left" : offset.left + paddingLeft($elem),
+				"width" : $elem.width(),
+				"height" : $elem.height()
+			});
+			
+			// add child class if this step has a parent step
+			if (step.parent) {
+				if (!$zone.hasClass("osh_is_child")) {
+					$zone.addClass("osh_is_child");
+				}
+				$zone.css({
+					"left" : $zone.offset().left
+				});
+				$zone.width($zone.width());
+			}
+			
+		}
 		
 		/* Creates clickable buttons over the targeted step elements */
 		self.buildClickableZones = function (steps, stepActivationCallback) {
 			
 			$.each(steps, function (index, step) {
-				console.debug("zone creating");
 				
-				var $elem = $(step.selector);
-				var offset = $(step.selector).offset();
-				
-				var $zone = $("<div class='osh_marked_zone' />")
-					.appendTo("body")
-					.css({
-						"top" : offset.top + paddingTop($elem),
-						"left" : offset.left + paddingLeft($elem),
-						"width" : $elem.width(),
-						"height" : $elem.height()
-					});
-					
-				// add child class if this step has a parent step
-				
-				if(step.parent){
-					
-					$zone.addClass("osh_is_child");
-					$zone.css({"left":$zone.offset().left});
-					$zone.width($zone.width());
-				}
+				//create zone and position it
+				var $zone = $("<div class='osh_marked_zone' />").appendTo("body");
+				_positionClickableZone($zone, step);
 				
 				$("<div/>").append($("<p />").text(step.title)).appendTo($zone);
 				
@@ -172,7 +247,7 @@
 				step.$zone = $zone;
 				
 				//bind step activation callback to $zone click event
-				step.$zone.click(function(e){
+				step.$zone.click(function (e) {
 					stepActivationCallback.call(self, step);
 				});
 				
@@ -268,11 +343,11 @@
 	var TutorialController = function () {
 		var self = this;
 		
-		/* Searches up the DOM for a tutorial step which would be a parent to the 
-		*  given jQuery element and returns the step
-		*/
+		/* Searches up the DOM for a tutorial step which would be a parent to the
+		 *  given jQuery element and returns the step
+		 */
 		function tryGetParent(steps, $elem) {
-		
+			
 			var resultStep;
 			$.each(steps, function (j, parStep) {
 				if ($elem.parents(parStep.selector).length > 0) {
@@ -292,6 +367,21 @@
 		// UI manipulation methods
 		this.highlightCallback = undefined;
 		this.showDescriptionCallback = undefined;
+		
+		/* Scrolls the view port to the defined tutorial step */
+		function _scrollToStep(step){
+			var yScroll;
+			if(!step.position || step.position.toLowerCase() === "top"){
+				yScroll = step.$zone.offset().top;
+			}else{
+			 yScroll =	(step.$elem.offset().top + paddingTop(step.$elem) - 50);
+			}
+			
+			$('body,html').animate({
+				scrollTop : yScroll
+			}, 1000);
+		
+		}
 		
 		/* Takes all raw tutorial steps and initializes the indexed array */
 		self.initialize = function (rawSteps) {
@@ -335,32 +425,27 @@
 			self.highlightCallback.call(self, newStep.selector, newStep.addPadding);
 			self.showDescriptionCallback.call(self, newStep);
 			
-			
-			
-			
-			
 			//remove the active css class from the previous link
 			if (_currStep) {
 				_currStep.$link.removeClass("active");
 				_currStep.$zone.show();
 				
-				if(_currStep.parent){
+				if (_currStep.parent) {
 					_currStep.parent.$zone.show();
 				}
 			}
 			
-			
-			if (newStep.parent){
+			if (newStep.parent) {
 				newStep.parent.$zone.hide();
 			}
-			
-			
 			
 			//add active css class to new $link
 			newStep.$zone.hide();
 			newStep.$link.addClass("active");
 			_currStep = newStep;
 			
+			// scroll to steps target
+			_scrollToStep(newStep);
 			
 		};
 		
@@ -387,6 +472,14 @@
 				
 				// activate step
 				self.activateStep(_stepsIndexed[nextIndex]);
+			}
+		};
+		
+		/* Reacts on browser resize and updates the UI elements */
+		self.browserResize = function () {
+			
+			if (_currStep) {
+				self.highlightCallback.call(self, _currStep.selector, _currStep.addPadding);
 			}
 		};
 	};
@@ -419,7 +512,7 @@
 		// You already have access to the DOM element and the options via the instance,
 		// e.g., this.element and this.options
 		
-		
+		var self = this;
 		// jQuery elem toolbar navigation buttons
 		this.$buttons = undefined;
 		
@@ -440,6 +533,12 @@
 		this.toolbarCreator = new ToolbarCreator();
 		this.toolbarCreator.createToolbarBasic(this.tutorialController.nextPrevStep);
 		this.toolbarCreator.createToolbarButtons(indexedSteps, this.tutorialController.activateStep);
+		
+		// react on window resize event
+		$(window).resize(function () {
+			self.tutorialController.browserResize();
+			self.highlighter.reposClickableZones(indexedSteps);
+		});
 		
 	};
 	
