@@ -94,7 +94,22 @@ ul.osh_button_list > li{
 	color: white;
 	font-size:1.8em;
 	line-height:1.2em;
-	top:36px;
+}
+
+.osh_arrow_box.top{
+	top:-36px;
+}
+
+.osh_arrow_box.left{
+	left:-36px;
+}
+
+.osh_arrow_box.right{
+	left:36px;
+}
+
+.osh_arrow_box.bottom{
+	bottom:-36px;
 }
 
 /* shared */

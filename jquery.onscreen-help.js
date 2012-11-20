@@ -11,6 +11,10 @@
 		return parseInt($elem.css("padding-top"), 10);
 	}
 	
+	function capitaliseFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+	
 	/* A step is an internally used tutorial step */
 	var Step = function () {
 		
@@ -38,11 +42,8 @@
 	var Calculator = function () {
 		var self = this;
 		
-		// our fading block size info objects
-		self.b1 = self.b2 = self.b3 = self.b4 = undefined;
-		
 		/* Initializes the calculator and sets the sizeInfo results for the 4 fading blocks */
-		self.initialize = function ($target, addPadding) {
+		self.fadingBlocks = function ($target, addPadding) {
 			
 			var offset = $target.offset();
 			var width = $target.width();
@@ -64,13 +65,57 @@
 			var x2 = x1 + width + 4; // + 2 because of border
 			var y2 = y1 + height;
 			
-			// calc size info objects
-			self.b1 = new SizeInfo(0, 0, "100%", y1);
-			self.b2 = new SizeInfo(x2, y1, docWidth - x2, height);
-			self.b3 = new SizeInfo(0, y1 + height, "100%", docHeight - y2);
-			self.b4 = new SizeInfo(0, y1, x1, height);
+			// return the calc size info objects
+			return {
+				b1 : new SizeInfo(0, 0, "100%", y1),
+				b2 : new SizeInfo(x2, y1, docWidth - x2, height),
+				b3 : new SizeInfo(0, y1 + height, "100%", docHeight - y2),
+				b4 : new SizeInfo(0, y1, x1, height)
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble bottom side */
+		self.descriptionBottom = function ($target, $descriptionOuter) {
 			
-			return this;
+			var descrWidthAdd = $descriptionOuter.width() / 2;
+			var offset = $target.offset();
+			return {
+				x : offset.left + ($target.width() / 2) - descrWidthAdd + paddingLeft($target),
+				y : offset.top + $target.height() + paddingTop($target)
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble left side */
+		self.descriptionLeft = function ($target, $descriptionOuter) {
+			
+			var descrHeightHalf = $descriptionOuter.height() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) - $descriptionOuter.width(),
+				y : (offset.top + paddingTop($target)) + ($target.height() / 2) - descrHeightHalf
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble top side */
+		self.descriptionTop = function ($target, $descriptionOuter) {
+			
+			var descrWidthHalf = $descriptionOuter.width() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) + ($target.width() / 2) - descrWidthHalf,
+				y : offset.top + paddingTop($target) - $descriptionOuter.height()
+			};
+		};
+		
+		/* Calculates the position info for the description speech bubble left side */
+		self.descriptionRight = function ($target, $descriptionOuter) {
+			
+			var descrHeightHalf = $descriptionOuter.height() / 2;
+			var offset = $target.offset();
+			return {
+				x : (offset.left + paddingLeft($target)) + $target.width(),
+				y : (offset.top + paddingTop($target)) + ($target.height() / 2) - descrHeightHalf
+			};
 		};
 		
 	};
@@ -105,13 +150,13 @@
 			}
 			
 			// calculate block size and positions
-			var calc = new Calculator().initialize($target, addPadding);
+			var result = new Calculator().fadingBlocks($target, addPadding);
 			
 			// update all block sizes and positions
-			self.$b1.update(calc.b1);
-			self.$b2.update(calc.b2);
-			self.$b3.update(calc.b3);
-			self.$b4.update(calc.b4);
+			self.$b1.update(result.b1);
+			self.$b2.update(result.b2);
+			self.$b3.update(result.b3);
+			self.$b4.update(result.b4);
 			
 		};
 		
@@ -142,15 +187,14 @@
 			
 			// change text
 			self.$descriptionBubble.text(step.description);
-			var descrWidthAdd = self.$descriptionOuter.width() / 2;
 			
-			var $target = $(step.selector);
-			var y = $target.offset().top + $target.height() + parseInt($target.css("padding-top"), 10);
-			var x = $target.offset().left + ($target.width() / 2) - descrWidthAdd + parseInt($target.css("padding-left"), 10);
+			// calculate the position for the description box
+			var position = "description" + capitaliseFirstLetter(step.position);
+			var result = new Calculator()[position](step.$elem, self.$descriptionOuter);
 			
 			self.$descriptionOuter.css({
-				"top" : y,
-				"left" : x
+				"top" : result.y,
+				"left" : result.x
 			});
 			
 		};
@@ -177,7 +221,6 @@
 			
 			// add child class if this step has a parent step
 			if (step.parent) {
-				
 				if (!$zone.hasClass("osh_is_child")) {
 					$zone.addClass("osh_is_child");
 				}
@@ -325,6 +368,21 @@
 		this.highlightCallback = undefined;
 		this.showDescriptionCallback = undefined;
 		
+		/* Scrolls the view port to the defined tutorial step */
+		function _scrollToStep(step){
+			var yScroll;
+			if(!step.position || step.position.toLowerCase() === "top"){
+				yScroll = step.$zone.offset().top;
+			}else{
+			 yScroll =	(step.$elem.offset().top + paddingTop(step.$elem) - 50);
+			}
+			
+			$('body,html').animate({
+				scrollTop : yScroll
+			}, 1000);
+		
+		}
+		
 		/* Takes all raw tutorial steps and initializes the indexed array */
 		self.initialize = function (rawSteps) {
 			
@@ -387,9 +445,7 @@
 			_currStep = newStep;
 			
 			// scroll to steps target
-			$('body,html').animate({
-				scrollTop : (newStep.$elem.offset().top + paddingTop(newStep.$elem) - 50)
-			}, 1000);
+			_scrollToStep(newStep);
 			
 		};
 		
