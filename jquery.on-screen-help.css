@@ -1,13 +1,14 @@
 .osh_block{
 	background-color: black;
 	margin: auto;
-	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	opacity: .4;
+	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	-o-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
-	position: absolute;
-	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	-ms-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	z-index: 100;
+	position: absolute;
 }
 .osh_toolbar_background{
 	background-color: black;
@@ -98,6 +99,7 @@ ul.osh_button_list > li{
 	position: absolute;
 	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	-ms-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
 	z-index: 150;
 }
 .osh_arrow_box{
