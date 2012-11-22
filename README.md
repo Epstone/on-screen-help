@@ -6,10 +6,11 @@ A jQuery tutorial plugin for any web page.
  **Demo:**
 [http://epstone.github.com/on-screen-help/demo/](http://epstone.github.com/on-screen-help/demo/ "DEMO")
 #Installation
-Include script *after* the jQuery library:
+Include script *after* the jQuery library and add the stylesheet
 
     <script src="/path/to/jquery.on-screen-help.js"></script> 
-
+	<link rel="stylesheet" type="text/css" href="../jquery.on-screen-help.css" />
+	
 #Usage
 
     $("body").onScreenHelp([{

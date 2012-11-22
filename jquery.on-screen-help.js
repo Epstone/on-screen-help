@@ -66,6 +66,11 @@
 		// internally detected parent tutorial step
 		// self.parent; 
 		
+		// [string] (optional)
+		// position for the description box
+		self.position = "bottom"; 
+		
+		
 		/* calculates the offset from the top respecting the padding setting */
 		self.offsetTop = function () {
 			return self.$elem.offset().top + addPadding("top");
@@ -176,9 +181,9 @@
 			
 			// return the calc size info objects
 			var result = {
-				b1 : new SizeInfo(0, 0, docWidth", y1),
+				b1 : new SizeInfo(0, 0, docWidth, y1),
 				b2 : new SizeInfo(x2, y1, docWidth - x2, step.absHeight()),
-				b3 : new SizeInfo(0, y2, docWidth", docHeight - y2),
+				b3 : new SizeInfo(0, y2, docWidth, docHeight - y2),
 				b4 : new SizeInfo(0, y1, x1, step.absHeight())
 			};
 			
