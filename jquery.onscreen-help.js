@@ -271,7 +271,11 @@
 			_initDescriptionBox(step.position);
 			
 			// change text
-			self.$descriptionBubble.text(step.description);
+			if(step.html){
+				self.$descriptionBubble.html(step.html);
+			}else{
+				self.$descriptionBubble.text(step.description);
+			}
 			
 			// calculate the position for the description box
 			var position = "description" + _capitaliseFirstLetter(step.position);

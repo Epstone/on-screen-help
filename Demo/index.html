@@ -24,7 +24,7 @@
 	<link rel="stylesheet" type="text/css" href="../jquery.onscreen-help.css" />
 </head>
 <body id="css-zen-garden">
-
+<a href="#" class="btn" id="start_tutorial">Start Tutorial</a>
 <div id="container">
 	<div id="intro">
 		<div id="pageHeader">
@@ -131,13 +131,13 @@
 <script type="text/javascript">
 
 $(function(){
-
+		
 	$("body").onScreenHelp([
-		{caption: "1", selector : "#preamble", description : "This is the preambel", padding: "all", position:"bottom" },
-		{caption: "Participation", selector : "#participation", description : "This is the participation section", padding: "all", position:"top",  navCaption:"2"},
-		{caption: "3", selector : "#linkList", addPadding: true, description : "This is the sidebar", position:"right"},
-		{caption: "4", selector : "#larchives", addPadding: true, padding: "all", description : "This is a small part of the sidebar", position:"right"},
-		{caption: "5", selector : "#requirements", addPadding: true, description : "This is the requirements section", padding:"all", position:"left"}
+		{caption: "1", selector : "#preamble", description : "This description box can be placed in different positions around the targeted element.", padding: "all", position:"bottom", startWith: true },
+		{caption: "Participation", navCaption:"2", selector : "#participation", description : "You can have different labels for the clickable zone and for the navigation button on the ground", padding: "all", position:"top"},
+		{caption: "3", selector : "#linkList", addPadding: true, description : "A tutorial step can be contained in another. There is just one parent-child level possible.", position:"right"},
+		{caption: "4", selector : "#larchives", addPadding: true, padding: "all", description : "This would be the child step. Parent clickable zone is hidden now. Parent-child relation is automatically detected through DOM.", position:"right"},
+		{caption: "last step", selector : "#requirements", addPadding: true, html : "<p>You can also include any html content through the step's html property. <br /> <br /> <a href='https://github.com/Epstone/on-screen-help' class='btn'>Back to Github</a></p>", padding:"all", position:"left"}
 	]);
 
 });
