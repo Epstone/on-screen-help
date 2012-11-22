@@ -1,5 +1,13 @@
-;
-(function ($, window, undefined) {
+/*!
+* jQuery on-screen-help plugin
+* https://github.com/Epstone/on-screen-help
+*
+* Copyright 2012, Patrick Epstein
+* Dual licensed under the MIT or GPL Version 2 licenses.
+* http://www.opensource.org/licenses/mit-license.php
+* http://www.opensource.org/licenses/GPL-2.0
+*/
+;(function ($, window, undefined) {
 	"use strict";
 	
 	var _cs_arr_box = "osh_arrow_box",
