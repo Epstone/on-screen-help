@@ -489,9 +489,8 @@
 			return resultStep;
 		}
 		
-		// UI manipulation methods
-		this.highlightCallback = undefined;
-		this.showDescriptionCallback = undefined;
+		// UI manipulation instance
+		self.highlighter = undefined;
 		
 		/* Scrolls the view port to the defined tutorial step */
 		function _scrollToStep(step) {
@@ -560,8 +559,8 @@
 			}
 			
 			// highlight and scroll there
-			self.highlightCallback.call(self, newStep);
-			self.showDescriptionCallback.call(self, newStep);
+			self.highlighter.highlight(newStep);
+			self.highlighter.showDescription(newStep);
 			
 			//remove the active css class from the previous link
 			if (_currStep) {
@@ -625,7 +624,8 @@
 		self.browserResize = function () {
 			
 			if (_currStep) {
-				self.highlightCallback.call(self, _currStep);
+				self.highlighter.highlight(_currStep);
+				self.highlighter.showDescription(_currStep);
 			}
 		};
 	};
@@ -667,8 +667,7 @@
 		var tutorialController = new TutorialController();
 		
 		var indexedSteps = tutorialController.initialize(this.steps);
-		tutorialController.highlightCallback = highlighter.highlight;
-		tutorialController.showDescriptionCallback = highlighter.showDescription;
+		tutorialController.highlighter = highlighter;
 		
 		//create the marked clickable zones over the black fading boxes
 		highlighter.buildClickableZones(indexedSteps, tutorialController.activateStep);
@@ -679,21 +678,31 @@
 		toolbarCreator.createToolbarButtons(indexedSteps, tutorialController.activateStep);
 		
 		// react on window resize event
-		$(window).resize(function () {
+		$(window).on("resize.osh", function () {
 			tutorialController.browserResize();
 			highlighter.reposClickableZones(indexedSteps);
 		});
 		
 		// register key binding functions
-		$(document).keyup(function (e) {
+		$(document).on("keyup.osh", function (e) {
 			
-			// delete key binding
-			if (e.keyCode == 27) {
+			// destroy plugin key binding
+			if (e.keyCode === self.options.hideKeyCode) {
 				highlighter.destroy();
 				toolbarCreator.destroy();
 				$(self.element).removeData('plugin_' + self.name);
+				
+				// remove event handlers
+				$(document).off(".osh");
 			}
 			
+			if(e.keyCode === 37){ //arrow left -> show previous step
+				tutorialController.nextPrevStep(-1);
+			}
+			
+			if(e.keyCode === 39){ // arrow right -> show next step
+				tutorialController.nextPrevStep(1);
+			}
 		});
 		
 		// yeah, this does nothing if no starting step is defined, see Step options
