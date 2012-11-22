@@ -9,7 +9,7 @@ A jQuery tutorial plugin for any web page.
 Include script *after* the jQuery library and add the stylesheet
 
     <script src="/path/to/jquery.on-screen-help.js"></script> 
-	<link rel="stylesheet" type="text/css" href="../jquery.on-screen-help.css" />
+	<link rel="stylesheet" type="text/css" href="/path/to/jquery.on-screen-help.css" />
 	
 #Usage
 
