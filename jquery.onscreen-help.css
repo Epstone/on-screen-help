@@ -111,6 +111,9 @@ ul.osh_button_list > li{
 	position: relative;
 	width: 280px;
 }
+
+/* These 4 settings control the extra space for the arrow, don't change if you don't 
+know what you are doing... */
 .osh_arrow_box.top{
 	top: -36px;
 }
@@ -202,7 +205,7 @@ ul.osh_button_list > li{
 	color: #000;
 	cursor: pointer;
 	font-size: 2em;
-	opacity: .9;
+	opacity: .7;
 	position: absolute;
 	text-align: center;
 	z-index: 150;

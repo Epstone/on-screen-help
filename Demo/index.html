@@ -132,14 +132,13 @@
 
 $(function(){
 
-	$("body").onScreenHelp({
-
-		"1": {selector : "#preamble", description : "This is the preambel", addPadding: true, position:"bottom" },
-		"2": {selector : "#participation", description : "This is the participation section", addPadding: true, position:"top" },
-		"3": {selector : "#linkList", addPadding: true, description : "This is the sidebar", position:"right"},
-		"4": {selector : "#larchives", addPadding: true, description : "This is a small part of the sidebar", position:"right"},
-		"5": {selector : "#requirements", addPadding: true, description : "This is the requirements section", position:"left"}
-	});
+	$("body").onScreenHelp([
+		{caption: "1", selector : "#preamble", description : "This is the preambel", padding: "all", position:"bottom" },
+		{caption: "Participation", selector : "#participation", description : "This is the participation section", padding: "all", position:"top",  navCaption:"2"},
+		{caption: "3", selector : "#linkList", addPadding: true, description : "This is the sidebar", position:"right"},
+		{caption: "4", selector : "#larchives", addPadding: true, padding: "all", description : "This is a small part of the sidebar", position:"right"},
+		{caption: "5", selector : "#requirements", addPadding: true, description : "This is the requirements section", padding:"all", position:"left"}
+	]);
 
 });
 
