@@ -679,21 +679,31 @@
 		toolbarCreator.createToolbarButtons(indexedSteps, tutorialController.activateStep);
 		
 		// react on window resize event
-		$(window).resize(function () {
+		$(window).on("resize.osh", function () {
 			tutorialController.browserResize();
 			highlighter.reposClickableZones(indexedSteps);
 		});
 		
 		// register key binding functions
-		$(document).keyup(function (e) {
+		$(document).on("keyup.osh", function (e) {
 			
 			// delete key binding
-			if (e.keyCode == 27) {
+			if (e.keyCode === self.options.hideKeyCode) {
 				highlighter.destroy();
 				toolbarCreator.destroy();
 				$(self.element).removeData('plugin_' + self.name);
+				
+				// remove event handlers
+				$(document).off(".osh");
 			}
 			
+			if(e.keyCode === 37){ //arrow left
+				tutorialController.nextPrevStep(-1);
+			}
+			
+			if(e.keyCode === 39){ // arrow right
+				tutorialController.nextPrevStep(1);
+			}
 		});
 		
 		// yeah, this does nothing if no starting step is defined, see Step options
