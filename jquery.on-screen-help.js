@@ -31,18 +31,40 @@
 		});
 	}
 	
-	/* A step is an internally used tutorial step */
+	/* A step is an internally used tutorial step 
+	/* selector [string] - jQuery selector for tutorial step
+	*/
 	var Step = function (selector) {
 		var self = this;
-		self.selector = selector; // element to highlight
-		self.margin; // extra space around element, NOT IMPLEMENTED YET
-		self.padding = "none"; // string containing top right left bottom, or none, or all
-		self.navCaption; //[optional] caption for the bottom navigation button
-		self.caption; // caption for clickable zone
-		self.$elem = $(selector); // jq elem selected by selector
-		self.$zone; // highlighted zone
-		self.parent; // internally used parent element
 		
+		// [string] 
+		// element selector to be highlighted
+		self.selector = selector;
+		
+		// [number] NOT IMPLEMENTED YET
+		// extra space around element
+		// self.margin;
+		
+		// [string] (optional)
+		// padding to be respected. Either a combination of top right left bottom, or none, or all
+		self.padding = "none";
+		
+		// [string] (optional)
+		// caption for the bottom navigation button
+		// self.navCaption;
+		
+		// [string] (optional)
+		// caption for clickable zone and navigation button
+		self.caption = "?"; 
+		
+		// jq elem selected by selector
+		self.$elem = $(selector); 
+		
+		// highlighted zone
+		//self.$zone; 
+		
+		// internally detected parent tutorial step
+		// self.parent; 
 		
 		/* calculates the offset from the top respecting the padding setting */
 		self.offsetTop = function () {
@@ -136,8 +158,9 @@
 	var Calculator = function () {
 		var self = this;
 		
-		/* Initializes the calculator and sets the sizeInfo results for the 4 fading blocks */
-		/* @padding [string] */
+		/** Initializes the calculator and sets the sizeInfo results for the 4 fading blocks 
+		* @param {Step} step The step for which the fading blocks should be calculated.
+		*/
 		self.fadingBlocks = function (step) {
 			
 			var docWidth = $(document).width();
@@ -271,9 +294,9 @@
 			_initDescriptionBox(step.position);
 			
 			// change text
-			if(step.html){
+			if (step.html) {
 				self.$descriptionBubble.html(step.html);
-			}else{
+			} else {
 				self.$descriptionBubble.text(step.description);
 			}
 			
