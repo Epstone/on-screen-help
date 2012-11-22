@@ -1,0 +1,225 @@
+.osh_block{
+	background-color: black;
+	margin: auto;
+	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	opacity: .4;
+	-o-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	position: absolute;
+	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	z-index: 100;
+}
+.osh_toolbar_background{
+	background-color: black;
+	opacity: .5;
+	
+}
+.osh_toolbar, .osh_toolbar_background{
+	bottom: 0;
+	height: 50px;
+	padding: 0;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+	z-index: 160;
+}
+.osh_toolbar{
+	background-color: transparent;
+	
+}
+.osh_button:visited{
+	color: white;
+}
+.osh_button{
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+}
+a.osh_button:hover, a.osh_nav_link:hover{
+	background-color: #666;
+	text-decoration: none;
+}
+a.osh_button:link, a.osh_nav_link:link{
+	color: white;
+}
+a.osh_button:active, a.osh_nav_link:active, a.osh_nav_link.active{
+	background-color: white;
+	color: black;
+}
+.osh_button.left{
+	left: 15px;
+}
+.osh_button.right{
+	right: 15px;
+}
+.osh_button{
+	border: 2px solid white;
+	color: white;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 2em;
+	text-decoration: none;
+	width:40px;
+	height:40px;
+	line-height:40px;
+	margin-top:3px;
+}
+
+ul.osh_button_list{
+	display: inline-block;
+	list-style-image: none;
+	list-style-type: none;
+	margin: 0;
+	
+}
+ul.osh_button_list > li{
+	background: none;
+	display: inline-block;
+	list-style-image: none;
+	list-style-type: none;
+	margin:0;
+	margin-right:3px;
+}
+.osh_nav_link{
+	border: 2px solid white;
+	color: white;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 2em;
+	padding: 0 12px;
+	text-decoration: none;
+	height:40px;
+	line-height:40px;
+	margin-top:2px;
+}
+.osh_arrow_box_outer{
+	-moz-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	-o-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	position: absolute;
+	transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	-webkit-transition: width 1s linear, height 1s linear, top 1s linear, left 1s linear;
+	z-index: 150;
+}
+.osh_arrow_box{
+	background: #000000;
+	border: 4px solid #c2e1f5;
+	color: white;
+	font-size: 1.8em;
+	
+	line-height: 1.2em;
+	padding: 40px;
+	position: relative;
+	width: 280px;
+}
+
+/* These 4 settings control the extra space for the arrow, don't change if you don't 
+know what you are doing... */
+.osh_arrow_box.top{
+	top: -36px;
+}
+.osh_arrow_box.left{
+	left: -36px;
+}
+.osh_arrow_box.right{
+	left: 36px;
+}
+.osh_arrow_box.bottom{
+	bottom: -36px;
+}
+.osh_arrow_box:after, .osh_arrow_box:before{
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	pointer-events: none;
+	position: absolute;
+	width: 0;
+}
+.osh_arrow_box.top:after, .osh_arrow_box.top:before{
+	top: 100%;
+}
+.osh_arrow_box.right:after, .osh_arrow_box.right:before{
+	right: 100%;
+}
+.osh_arrow_box.bottom:after, .osh_arrow_box.bottom:before{
+	bottom: 100%;
+}
+.osh_arrow_box.left:after, .osh_arrow_box.left:before{
+	left: 100%;
+}
+.osh_arrow_box:after{
+	border-color: rgba(0, 0, 0, 0);
+	border-width: 30px;
+}
+.osh_arrow_box.top:after , .osh_arrow_box.bottom:after{
+	left: 50%;
+	margin-left: -30px;
+}
+.osh_arrow_box.top:after{
+	border-top-color: #000000;
+}
+.osh_arrow_box.bottom:after{
+	border-bottom-color: #000000;
+}
+.osh_arrow_box.right:after , .osh_arrow_box.left:after{
+	margin-top: -30px;
+	top: 50%;
+}
+.osh_arrow_box.right:after{
+	border-right-color: #000000;
+}
+.osh_arrow_box.left:after{
+	border-left-color: #000000;
+}
+.osh_arrow_box:before{
+	border-color: rgba(194, 225, 245, 0);
+	border-width: 36px;
+}
+.osh_arrow_box.bottom:before, .osh_arrow_box.top:before{
+	left: 50%;
+	margin-left: -36px;
+}
+.osh_arrow_box.bottom:before{
+	border-bottom-color: #c2e1f5;
+}
+.osh_arrow_box.top:before{
+	border-top-color: #c2e1f5;
+}
+.osh_arrow_box.left:before, .osh_arrow_box.right:before{
+	margin-top: -36px;
+	top: 50%;
+}
+.osh_arrow_box.left:before{
+	border-left-color: #c2e1f5;
+}
+.osh_arrow_box.right:before{
+	border-right-color: #c2e1f5;
+}
+.osh_marked_zone.osh_is_child{
+	background-color: transparent;
+	border: 2px dashed green;
+	color: black;
+}
+.osh_marked_zone{
+	background-color: lime;
+	border: 2px solid white;
+	color: #000;
+	cursor: pointer;
+	font-size: 2em;
+	opacity: .7;
+	position: absolute;
+	text-align: center;
+	z-index: 150;
+}
+.osh_marked_zone:hover{
+	background-color: yellow;
+}
+.osh_marked_zone > div{
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+.osh_marked_zone > div > p{
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
