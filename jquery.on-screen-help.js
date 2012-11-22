@@ -176,9 +176,9 @@
 			
 			// return the calc size info objects
 			var result = {
-				b1 : new SizeInfo(0, 0, "100%", y1),
+				b1 : new SizeInfo(0, 0, docWidth", y1),
 				b2 : new SizeInfo(x2, y1, docWidth - x2, step.absHeight()),
-				b3 : new SizeInfo(0, y2, "100%", docHeight - y2),
+				b3 : new SizeInfo(0, y2, docWidth", docHeight - y2),
 				b4 : new SizeInfo(0, y1, x1, step.absHeight())
 			};
 			
