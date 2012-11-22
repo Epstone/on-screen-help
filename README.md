@@ -4,7 +4,7 @@ jQuery.on-screen-help
 A jQuery tutorial plugin for any web page.
 
  **Demo:**
-[https://github.com/Epstone/on-screen-help](https://github.com/Epstone/on-screen-help "DEMO")
+[http://epstone.github.com/on-screen-help/demo/](http://epstone.github.com/on-screen-help/demo/ "DEMO")
 #Installation
 Include script *after* the jQuery library:
 
