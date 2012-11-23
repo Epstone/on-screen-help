@@ -14,14 +14,17 @@ Include script *after* the jQuery library and add the stylesheet
 #Usage
 
     $("body").onScreenHelp([{
-		  caption: "1", // caption for clickable zone,
-		  navCaption: "Navigation button caption", // [optional] caption used as default
+		
+		  caption: "1", // [optional] caption for clickable zone,
+		  navCaption: "Navigation button caption", // [optional] if not provided auto-numbered
 		  selector : "#preamble", // selector for element to be highlighted
 		  description : "Speech bubble text", // text for description box
-		  html : "<div> use either description or html</div>, // [optional] html for description box
+		  html : "<div> use either description or html</div>", // [optional] html for description box
 		  padding: "all", // [optional] Respect padding: "none" (default), "all", or a combination of top, right, bottom, left
-		  position:"bottom", // [optional] position of the speech bubble. top, left, bottom or right
-		  startWith: true // [optional] this should be the step to start with
+		  position: "bottom", // [optional] position of the speech bubble. top, left, bottom or right
+		  startWith: true, // [optional] this should be the step to start with
+		  runBefore: function(){}, // [function] runs before activating the step
+		  runAfter: function(){} // [function] runs when the step gets deactivated
 	     },
 		{
 			// next step...

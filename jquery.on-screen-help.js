@@ -63,7 +63,7 @@
 		
 		// [string] (optional)
 		// caption for clickable zone and navigation button
-		self.caption = "?"; 
+		//self.caption = ""; 
 		
 		// jq elem selected by selector
 		self.$elem = $(selector); 
@@ -77,6 +77,14 @@
 		// [string] (optional)
 		// position for the description box
 		self.position = "bottom"; 
+		
+		// [callback function] (optional)
+		// this method runs before a step gets activated
+		// self.runBefore; 
+		
+		// [callback function] (optional)
+		// this method runs when a step gets deactivated
+		// self.runAfter;
 		
 		
 		/* calculates the offset from the top respecting the padding setting */
@@ -433,7 +441,7 @@
 			self.$buttons = $("<ul class='osh_button_list' />");
 			var $btnLeft = $("<a class='left osh_button' href='#'>&lt;</a>");
 			var $btnRight = $("<a href='#' class='right osh_button' >&gt;</a>");
-			var $toolbar = _getJDiv(_cs_toolbar).append([$btnLeft, $btnRight, self.$buttons]);
+			var $toolbar = _getJDiv(_cs_toolbar).append($btnLeft).append($btnRight).append(self.$buttons); // can't use array atm because of a bug in jqTemplates, sry
 			
 			// bind step changer function to the left and right button
 			$btnLeft.click(function (e) {
@@ -535,6 +543,9 @@
 				iStep.index = i;
 				i++;
 				
+				//set the index as the steps navCaption if not defined
+				iStep.navCaption = step.navCaption || i.toString();
+				
 				//check if this should be the first step to be activated
 				if (step.startWith) {
 					_startWithStep = iStep;
@@ -569,6 +580,16 @@
 			//do nothing if setp equals the previous one
 			if (newStep === _currStep) {
 				return;
+			}
+			
+			//execute runAfter callback
+			if(_currStep && _currStep.runAfter && $.isFunction(_currStep.runAfter)){
+				_currStep.runAfter.apply();
+			}
+			
+			//execute runBefore callback
+			if(newStep.runBefore && $.isFunction(newStep.runBefore)){
+				newStep.runBefore.apply();
 			}
 			
 			// highlight and scroll there
