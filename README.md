@@ -15,7 +15,7 @@ Include script *after* the jQuery library and add the stylesheet
 
     $("body").onScreenHelp([{
 		
-		  caption: "1", // [optional] caption for clickable zone,
+		  caption: "1", // [optional] caption for clickable zone
 		  navCaption: "Navigation button caption", // [optional] if not provided auto-numbered
 		  selector : "#preamble", // selector for element to be highlighted
 		  description : "Speech bubble text", // text for description box

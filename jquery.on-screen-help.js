@@ -616,7 +616,9 @@
 			_currStep = newStep;
 			
 			// scroll to steps target
-			_scrollToStep(newStep);
+			if(newStep.scrollTo){
+				_scrollToStep(newStep);
+			}
 			
 		};
 		
