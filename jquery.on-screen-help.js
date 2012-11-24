@@ -445,12 +445,12 @@
 			
 			// bind step changer function to the left and right button
 			$btnLeft.click(function (e) {
-				e.preventDefault();
 				prevNextStepCallback.call(self, -1);
+				return false;
 			});
 			$btnRight.click(function (e) {
-				e.preventDefault();
 				prevNextStepCallback.call(self, 1);
+				return false;
 			});
 			
 			$("body").append($toolbar);
@@ -469,10 +469,9 @@
 				
 				//switch to the wanted step when user clicks a navigation button
 				$link.click(function (e) {
-					e.preventDefault();
-					
 					// activates the clicked link and the tutorial step
 					stepActivationCallback.call(self, step);
+					return false;
 				});
 				
 				// append tutorial navigation buttons to toolbar
@@ -671,7 +670,8 @@
 	var onScreenHelp = 'onScreenHelp',
 	document = window.document,
 	defaults = {
-		hideKeyCode : 27 // escape key
+		hideKeyCode : 27,
+		allowEventPropagation: true, // esc, left, right arrow key presses will bubble up if true
 	};
 	
 	// The actual plugin constructor
@@ -738,6 +738,11 @@
 			
 			if(e.keyCode === 39){ // arrow right -> show next step
 				tutorialController.nextPrevStep(1);
+			}
+			
+			// check if event bubbling should be allowed
+			if(!self.options.allowEventPropagation){
+				e.stopPropagation();
 			}
 		});
 		
