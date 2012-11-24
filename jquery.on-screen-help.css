@@ -40,7 +40,7 @@ a.osh_button:hover, a.osh_nav_link:hover{
 	background-color: #666;
 	text-decoration: none;
 }
-a.osh_button:link, a.osh_nav_link:link{
+a.osh_button:link, a.osh_nav_link:link, a.osh_button:visited, a.osh_nav_link:visited{
 	color: white;
 }
 a.osh_button:active, a.osh_nav_link:active, a.osh_nav_link.active{
