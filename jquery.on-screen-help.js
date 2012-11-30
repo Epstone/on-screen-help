@@ -739,7 +739,7 @@
 		// react on window resize event
 		$(window).on("resize.osh", function () {
 			tutorialController.browserResize();
-			highlighter.reposClickableZones(indexedSteps);
+			self.highlighter.reposClickableZones(indexedSteps);
 		});
 		
 		// register key binding functions
@@ -774,7 +774,8 @@
 		
 		this.highlighter.destroy();
 		this.toolbarCreator.destroy();
-		$(this.element).removeData('plugin_' + self.name);
+		
+		$(this.element).removeData('plugin_' + this.name);
 		
 		// remove event handlers
 		$(document).off(".osh");

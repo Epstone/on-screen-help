@@ -53,8 +53,7 @@ a.osh_button:active, a.osh_nav_link:active, a.osh_nav_link.active{
 .osh_button.right{
 	right: 15px;
 }
-
-.osh_close{
+.osh_close:link, .osh_close:visited, .osh_close:active{
 	position:fixed;
 	right:0;
 	top:0;
@@ -68,12 +67,16 @@ a.osh_button:active, a.osh_nav_link:active, a.osh_nav_link.active{
 	font-size:2em;
 	line-height:2em;
 	text-decoration:none;
+	color:black;
 }
+
 .osh_close:hover{
 	background-color:gray;
 	color:white;
 	text-decoration:none;
 }
+
+
 
 .osh_button{
 	border: 2px solid white;
