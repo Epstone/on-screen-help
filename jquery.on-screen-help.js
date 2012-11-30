@@ -1,13 +1,14 @@
 /*!
-* jQuery on-screen-help plugin
-* https://github.com/Epstone/on-screen-help
-*
-* Copyright 2012, Patrick Epstein
-* Dual licensed under the MIT or GPL Version 2 licenses.
-* http://www.opensource.org/licenses/mit-license.php
-* http://www.opensource.org/licenses/GPL-2.0
-*/
-;(function ($, window, undefined) {
+ * jQuery on-screen-help plugin
+ * https://github.com/Epstone/on-screen-help
+ *
+ * Copyright 2012, Patrick Epstein
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/GPL-2.0
+ */
+;
+(function ($, window, undefined) {
 	"use strict";
 	
 	var _cs_arr_box = "osh_arrow_box",
@@ -15,7 +16,8 @@
 	_cs_osh_block = "osh_block",
 	_cs_toolbar = "osh_toolbar",
 	_cs_marked_zone = "osh_marked_zone",
-	_cs_toolbar_bg = "osh_toolbar_background";
+	_cs_toolbar_bg = "osh_toolbar_background",
+	_cs_close = "osh_close";
 	
 	function _paddingHelper($elem, position) {
 		return parseInt($elem.css("padding-" + position), 10);
@@ -39,13 +41,13 @@
 		});
 	}
 	
-	/* A step is an internally used tutorial step 
+	/* A step is an internally used tutorial step
 	/* selector [string] - jQuery selector for tutorial step
-	*/
+	 */
 	var Step = function (selector) {
 		var self = this;
 		
-		// [string] 
+		// [string]
 		// element selector to be highlighted
 		self.selector = selector;
 		
@@ -63,29 +65,32 @@
 		
 		// [string] (optional)
 		// caption for clickable zone and navigation button
-		//self.caption = ""; 
+		//self.caption = "";
 		
 		// jq elem selected by selector
-		self.$elem = $(selector); 
+		self.$elem = $(selector);
 		
 		// highlighted zone
-		//self.$zone; 
+		//self.$zone;
 		
 		// internally detected parent tutorial step
-		// self.parent; 
+		// self.parent;
 		
 		// [string] (optional)
 		// position for the description box
-		self.position = "bottom"; 
+		self.position = "bottom";
 		
 		// [callback function] (optional)
 		// this method runs before a step gets activated
-		// self.runBefore; 
+		// self.runBefore;
 		
 		// [callback function] (optional)
 		// this method runs when a step gets deactivated
 		// self.runAfter;
 		
+		// [boolean] (optional)
+		// set to true to always scroll to this step or false if not, or let the global setting handle it
+		self.scrollTo = undefined;
 		
 		/* calculates the offset from the top respecting the padding setting */
 		self.offsetTop = function () {
@@ -179,9 +184,9 @@
 	var Calculator = function () {
 		var self = this;
 		
-		/** Initializes the calculator and sets the sizeInfo results for the 4 fading blocks 
-		* @param {Step} step The step for which the fading blocks should be calculated.
-		*/
+		/** Initializes the calculator and sets the sizeInfo results for the 4 fading blocks
+		 * @param {Step} step The step for which the fading blocks should be calculated.
+		 */
 		self.fadingBlocks = function (step) {
 			
 			var docWidth = $(document).width();
@@ -430,17 +435,18 @@
 		
 		/* Destroys all UI elements created by the toolbar creator */
 		self.destroy = function () {
-			_removeByClasses([_cs_toolbar, _cs_toolbar_bg]);
+			_removeByClasses([_cs_toolbar, _cs_toolbar_bg, _cs_close]);
 		}
 		
 		/* Creates the toolbar including the left and right navigation buttons */
-		self.createToolbarBasic = function (prevNextStepCallback) {
+		self.createToolbarBasic = function (prevNextStepCallback, destroyCallback) {
 			
 			//creates the toolbar, its background and the left and right buttons
 			_getJDiv(_cs_toolbar_bg).appendTo("body"); // toolbar background
 			self.$buttons = $("<ul class='osh_button_list' />");
 			var $btnLeft = $("<a class='left osh_button' href='#'>&lt;</a>");
 			var $btnRight = $("<a href='#' class='right osh_button' >&gt;</a>");
+			
 			var $toolbar = _getJDiv(_cs_toolbar).append($btnLeft).append($btnRight).append(self.$buttons); // can't use array atm because of a bug in jqTemplates, sry
 			
 			// bind step changer function to the left and right button
@@ -452,6 +458,17 @@
 				prevNextStepCallback.call(self, 1);
 				return false;
 			});
+			
+			//create the close button
+			var $btnClose = $("<a href='#' class='" + _cs_close + "'>X</a>");
+			
+			//bind destroy callback
+			$btnClose.click(function () {
+				destroyCallback.call(self);
+				return false;
+			});
+			
+			$("body").append($btnClose);
 			
 			$("body").append($toolbar);
 		};
@@ -482,7 +499,7 @@
 	};
 	
 	/* Handles the tutorial steps and reacts on user events */
-	var TutorialController = function () {
+	var TutorialController = function (scrollAlways) {
 		var self = this;
 		
 		// currently active tutorial step
@@ -493,6 +510,9 @@
 		
 		//default step to start with, user defined
 		var _startWithStep;
+		
+		// always scroll to show the next highlighted zone
+		var _scrollAlways = scrollAlways;
 		
 		/* Searches up the DOM for a tutorial step which would be a parent to the
 		 *  given jQuery element and returns the step
@@ -582,12 +602,12 @@
 			}
 			
 			//execute runAfter callback
-			if(_currStep && _currStep.runAfter && $.isFunction(_currStep.runAfter)){
+			if (_currStep && _currStep.runAfter && $.isFunction(_currStep.runAfter)) {
 				_currStep.runAfter.apply();
 			}
 			
 			//execute runBefore callback
-			if(newStep.runBefore && $.isFunction(newStep.runBefore)){
+			if (newStep.runBefore && $.isFunction(newStep.runBefore)) {
 				newStep.runBefore.apply();
 			}
 			
@@ -615,7 +635,7 @@
 			_currStep = newStep;
 			
 			// scroll to steps target
-			if(newStep.scrollTo){
+			if ((typeof newStep.scrollTo === "undefined" && _scrollAlways) || newStep.scrollTo) {
 				_scrollToStep(newStep);
 			}
 			
@@ -671,7 +691,8 @@
 	document = window.document,
 	defaults = {
 		hideKeyCode : 27,
-		allowEventPropagation: true, // esc, left, right arrow key presses will bubble up if true
+		allowEventPropagation : true, // esc, left, right arrow key presses will bubble up if true,
+		scrollAlways : false
 	};
 	
 	// The actual plugin constructor
@@ -697,21 +718,23 @@
 		var self = this;
 		
 		// The highlighter object instance
-		var highlighter = new Highlighter();
+		self.highlighter = new Highlighter();
 		
 		//the tutorial controller -> init callbacks for UI manipulation
-		var tutorialController = new TutorialController();
+		var tutorialController = new TutorialController(this.options.scrollAlways);
 		
 		var indexedSteps = tutorialController.initialize(this.steps);
-		tutorialController.highlighter = highlighter;
+		tutorialController.highlighter = this.highlighter;
 		
 		//create the marked clickable zones over the black fading boxes
-		highlighter.buildClickableZones(indexedSteps, tutorialController.activateStep);
+		this.highlighter.buildClickableZones(indexedSteps, tutorialController.activateStep);
 		
 		// The Toolbar creator -> build it
-		var toolbarCreator = new ToolbarCreator();
-		toolbarCreator.createToolbarBasic(tutorialController.nextPrevStep);
-		toolbarCreator.createToolbarButtons(indexedSteps, tutorialController.activateStep);
+		this.toolbarCreator = new ToolbarCreator();
+		this.toolbarCreator.createToolbarBasic(tutorialController.nextPrevStep, function () {
+			self.destroy();
+		});
+		this.toolbarCreator.createToolbarButtons(indexedSteps, tutorialController.activateStep);
 		
 		// react on window resize event
 		$(window).on("resize.osh", function () {
@@ -724,24 +747,19 @@
 			
 			// destroy plugin key binding
 			if (e.keyCode === self.options.hideKeyCode) {
-				highlighter.destroy();
-				toolbarCreator.destroy();
-				$(self.element).removeData('plugin_' + self.name);
-				
-				// remove event handlers
-				$(document).off(".osh");
+				self.destroy();
 			}
 			
-			if(e.keyCode === 37){ //arrow left -> show previous step
+			if (e.keyCode === 37) { //arrow left -> show previous step
 				tutorialController.nextPrevStep(-1);
 			}
 			
-			if(e.keyCode === 39){ // arrow right -> show next step
+			if (e.keyCode === 39) { // arrow right -> show next step
 				tutorialController.nextPrevStep(1);
 			}
 			
 			// check if event bubbling should be allowed
-			if(!self.options.allowEventPropagation){
+			if (!self.options.allowEventPropagation) {
 				e.stopPropagation();
 			}
 		});
@@ -750,6 +768,17 @@
 		tutorialController.showFirstStep();
 		
 	};
+	
+	/* Closes the plugin and removes all ui and eventhandlers */
+	Plugin.prototype.destroy = function () {
+		
+		this.highlighter.destroy();
+		this.toolbarCreator.destroy();
+		$(this.element).removeData('plugin_' + self.name);
+		
+		// remove event handlers
+		$(document).off(".osh");
+	}
 	
 	/* expose classes for testing */
 	window.osh_testing = {

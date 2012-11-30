@@ -132,12 +132,16 @@
 $(function(){
 		
 	$("body").onScreenHelp([
-		{caption: "Preamble", selector : "#preamble", description : "This description box can be placed in different positions around the targeted element.", padding: "all", position:"bottom", startWith: true },
+		{caption: "Preamble", selector : "#preamble", description : "This description box can be placed in different positions around the targeted element.", padding: "all", position:"bottom", startWith: true, scrollTo:false },
 		{caption: "Participation", navCaption:"2", selector : "#participation", description : "You can have different labels for the clickable zone and for the navigation button on the ground.", padding: "all", position:"top"},
 		{selector : "#linkList", addPadding: true, description : "A tutorial step can be contained in another. There is just one parent-child level possible.", position:"right"},
 		{selector : "#larchives", addPadding: true, padding: "all", description : "This would be the child step. Parent clickable zone is hidden now. Parent-child relation is automatically detected through DOM.", position:"right"},
 		{navCaption: "last step", selector : "#requirements", addPadding: true, html : "<p>You can also include any html content through the step's html property. <br /> <a href='https://github.com/Epstone/on-screen-help' class='btn'>Back to Github</a></p>", padding:"all", position:"left"}
-	]);
+	],{
+		scrollAlways : true, // allways scroll to the next / prev step, can be overwritten through step's setting (default => true)
+		hideKeyCode : 27, // close on escape (default => 27)
+		allowEventPropagation : true //(default => true)
+	});
 
 });
 
